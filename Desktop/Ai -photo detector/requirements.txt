@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+python-multipart
+pillow
+numpy
+imagehash
+transformers
+torch
+faiss-cpu
+easyocr
+face-recognition
+scikit-learn
+pytest
+httpx

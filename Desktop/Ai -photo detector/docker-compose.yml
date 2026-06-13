@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  photomind-api:
+    build: .
+    container_name: photomind_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///app/data/database.db
+      - UPLOAD_DIR=/app/data/uploads
+      - FAISS_INDEX_PATH=/app/data/faiss_index.bin
+      - CLIP_MODEL_NAME=openai/clip-vit-base-patch32
+      - PHASH_THRESHOLD=10
+      - FACE_DISTANCE_THRESHOLD=0.6
+    restart: unless-stopped

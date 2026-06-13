@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoMind AI — Premium Photo Organizer</title>
+    <!-- Google Fonts: Outfit for clean luxury feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=1.0.2">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <svg class="logo-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 21l8.904-4.474a9.003 9.003 0 10-8.09-8.09L9.813 15.904z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <div class="brand-details">
+                    <h1>PhotoMind AI</h1>
+                    <span class="version-badge">v1.0.0</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="search">
+                    <span class="nav-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.602 10.602z"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Explore & Search</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="categories">
+                    <span class="nav-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Categories</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="upload">
+                    <span class="nav-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Add Photos</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="duplicates">
+                    <span class="nav-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125v-9.75c0-.621.504-1.125 1.125-1.125h3.375m7.5 7.5h3.375c.621 0 1.125-.504 1.125-1.125v-9.75c0-.621-.504-1.125-1.125-1.125h-9.75a1.125 1.125 0 00-1.125 1.125V5.25m7.5 7.5V5.25m0 0L10.875 7.5M12 3.75l1.125 1.125"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Duplicates</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p class="status-indicator">
+                    <span class="dot-ripple"></span>
+                    <span class="status-text">Local Engine Online</span>
+                </p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            
+            <!-- SECTION 1: SEARCH & EXPLORE -->
+            <section id="search-tab" class="tab-content active">
+                <div class="page-header">
+                    <h2>Discover Library</h2>
+                    <p class="subtitle">Search your photos naturally with semantic descriptions or keywords.</p>
+                </div>
+
+                <div class="search-container card">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="e.g., 'a cat sitting on the grass' or 'invoice receipt'..." autocomplete="off">
+                        <button id="search-btn" class="btn-primary">
+                            <span>Search</span>
+                        </button>
+                    </div>
+                    
+                    <div class="search-filters">
+                        <span class="filter-label">Search Method:</span>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="search-type" value="semantic" checked>
+                                <span class="custom-radio">Semantic AI</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="search-type" value="ocr">
+                                <span class="custom-radio">OCR Text</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="search-type" value="combined">
+                                <span class="custom-radio">Combined</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-header" style="display: none;">
+                    <h3>Search Results</h3>
+                    <span id="results-count" class="count-tag">0 found</span>
+                </div>
+
+                <!-- Photos Grid -->
+                <div id="photos-grid" class="photos-grid">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"></path>
+                            </svg>
+                        </div>
+                        <h3>Explore your photos</h3>
+                        <p>Search above or start uploading your images to see them here.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: CATEGORIES -->
+            <section id="categories-tab" class="tab-content">
+                <div class="page-header">
+                    <h2>Smart Folders</h2>
+                    <p class="subtitle">Photos are classified automatically using zero-shot deep learning.</p>
+                </div>
+
+                <!-- Folders Container -->
+                <div id="folders-grid" class="folders-grid">
+                    <!-- Categories will load dynamically here as visual folders -->
+                </div>
+
+                <!-- Active Category View Drawer -->
+                <div id="category-viewer" class="category-viewer card" style="display: none;">
+                    <div class="category-viewer-header">
+                        <button id="back-to-folders-btn" class="btn-text">
+                            <svg class="back-arrow-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            <span>Back to Folders</span>
+                        </button>
+                        <h3 id="current-category-title">Category Name</h3>
+                    </div>
+                    <div id="category-photos-grid" class="photos-grid"></div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: UPLOAD & SCAN -->
+            <section id="upload-tab" class="tab-content">
+                <div class="page-header">
+                    <h2>Add New Media</h2>
+                    <p class="subtitle">Upload single files or scan entire directories on your machine.</p>
+                </div>
+
+                <div class="grid-two-cols">
+                    <!-- Drag & Drop Upload Card -->
+                    <div class="card upload-card">
+                        <div class="card-header">
+                            <h3>Single File Upload</h3>
+                            <p class="card-desc">Drag and drop any image or click below to select.</p>
+                        </div>
+                        
+                        <div class="dropzone" id="upload-dropzone">
+                            <input type="file" id="file-input" accept="image/*" style="display: none;">
+                            <div class="dropzone-content">
+                                <div class="upload-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path>
+                                    </svg>
+                                </div>
+                                <p class="primary-text">Drag file here or <span class="browse-link">browse files</span></p>
+                                <p class="secondary-text">Supports JPG, PNG, WEBP, BMP</p>
+                            </div>
+                        </div>
+                        
+                        <div id="upload-progress-container" class="progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="upload-progress-fill"></div>
+                            </div>
+                            <p class="progress-status" id="upload-progress-status">Uploading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Directory Scanner Card -->
+                    <div class="card scanner-card">
+                        <div class="card-header">
+                            <h3>Directory Scan</h3>
+                            <p class="card-desc">Scan a local directory to import and classify photos in the background.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="directory-path-input">Local Folder Path</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="directory-path-input" placeholder="e.g., /Users/username/Pictures/Holiday" autocomplete="off">
+                                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776"></path>
+                                </svg>
+                            </div>
+                            <span class="help-text">Input an absolute path to a folder on your system.</span>
+                        </div>
+                        
+                        <button id="start-scan-btn" class="btn-primary">
+                            <span>Start Scanning Folder</span>
+                        </button>
+                        
+                        <div id="scan-status-card" class="status-toast" style="display: none;">
+                            <div class="toast-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="toast-body">
+                                <h4 id="scan-status-title">Scan Initialized</h4>
+                                <p id="scan-status-desc">Scanning directory in the background...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: DUPLICATES -->
+            <section id="duplicates-tab" class="tab-content">
+                <div class="page-header">
+                    <h2>Duplicate Finder</h2>
+                    <p class="subtitle">Identify identical or slightly modified duplicates via Perceptual Hashing (pHash).</p>
+                </div>
+
+                <div class="duplicates-controls card">
+                    <div class="range-control-group">
+                        <span class="filter-label">Hamming Sensitivity:</span>
+                        <div class="slider-group">
+                            <input type="range" id="duplicate-threshold" min="0" max="20" value="10">
+                            <span id="threshold-val" class="badge-number">10</span>
+                        </div>
+                    </div>
+                    <button id="refresh-duplicates-btn" class="btn-secondary">Analyze & Refresh</button>
+                </div>
+
+                <div id="duplicates-container" class="duplicates-container">
+                    <!-- Duplicates lists will render here side-by-side -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- LIGHTBOX MODAL: FULL RESOLUTION VIEWER -->
+    <div id="photo-modal" class="modal">
+        <div class="modal-content card">
+            <span class="close-modal-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </span>
+            <div class="modal-grid">
+                <div class="modal-image-pane">
+                    <img id="modal-img" src="" alt="High resolution preview">
+                </div>
+                <div class="modal-details-pane">
+                    <div class="modal-details-header">
+                        <h3 id="modal-filename">Photo Name.jpg</h3>
+                        <p class="modal-date" id="modal-date">Uploaded on: --</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4>AI Group Category</h4>
+                        <span class="tag" id="modal-category">Other</span>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4>Dimensions & File Info</h4>
+                        <div class="meta-table">
+                            <div class="meta-row">
+                                <span class="meta-label">Resolution</span>
+                                <span class="meta-value" id="modal-dimensions">--</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">File Size</span>
+                                <span class="meta-value" id="modal-filesize">--</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">pHash Key</span>
+                                <span class="meta-value" id="modal-phash">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section" id="modal-ocr-section">
+                        <h4>Extracted Text (OCR)</h4>
+                        <div class="ocr-text-box" id="modal-ocr-text">
+                            No text detected.
+                        </div>
+                    </div>
+                    
+                    <div class="detail-action">
+                        <a id="modal-download-link" href="" download class="btn-primary-action">
+                            <span>Download Full Image</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js?v=1.0.2"></script>
+</body>
+</html>
