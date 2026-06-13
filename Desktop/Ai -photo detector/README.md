@@ -1,280 +1,236 @@
-# PhotoMind AI
+# 🧠 PhotoMind AI — Local AI Photo Organizer
 
-PhotoMind AI is a powerful, locally deployable, AI-powered photo management platform. It ingests your image collections, detects near/exact duplicates, extracts text using OCR, groups photos by detected faces (people), and provides natural language semantic query capabilities.
+> A fully local, privacy-first AI photo management platform. No cloud. No subscriptions. Just your photos, organized intelligently on your own machine.
 
----
-
-## Architecture Overview
-
-```mermaid
-graph TD
-    Client[HTTP Client / Frontend] -->|API Requests| API[FastAPI Layer]
-    API -->|Ingest / Scan| Pipe[Processing Pipeline]
-    
-    subgraph pipeline [Processing Services]
-        Pipe -->|1. Storage| StorageService[Storage Service]
-        Pipe -->|2. pHash| pHashService[Perceptual Hashing]
-        Pipe -->|3. CLIP| CLIPService[CLIP Embeddings]
-        Pipe -->|4. OCR| EasyOCR[EasyOCR Text Extraction]
-        Pipe -->|5. Face Rec| FaceRec[Face Recognition & DBSCAN Clustering]
-    end
-    
-    StorageService -->|Save Files| Filesystem[(Local Folder: data/uploads)]
-    pHashService -->|Compute Hamming Distance| SQLiteDB[(Metadata: data/database.db)]
-    CLIPService -->|Zero-Shot Classification| SQLiteDB
-    CLIPService -->|Generate 512-d Encodings| FAISSIndex[Vector Search Index: data/faiss_index.bin]
-    EasyOCR -->|Extracted Text| SQLiteDB
-    FaceRec -->|Group People| SQLiteDB
-    
-    API -->|Semantic Search Query| FAISSIndex
-    API -->|Metadata / Duplicates| SQLiteDB
-```
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat&logo=fastapi&logoColor=white)
+![CLIP](https://img.shields.io/badge/OpenAI-CLIP-412991?style=flat&logo=openai&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat)
 
 ---
 
-## Features
+## ✨ Features
 
-1. **Semantic Search:** Search your photos with natural queries (e.g. *"black cat sitting in the garden"*) using CLIP embeddings and FAISS index search.
-2. **Duplicate Detection:** Find exact and near-duplicates automatically utilizing Perceptual Hashing (pHash).
-3. **OCR (Optical Character Recognition):** Scan documents, receipts, and images with embedded text automatically using EasyOCR.
-4. **Face Clustering (People Grouping):** Automatically detect faces, compute 128-dimensional biometric embeddings, and group them into people clusters using DBSCAN.
-5. **Zero-Shot Categorization:** Automatically sort photos into classes like `Landscape/Nature`, `Document/Receipt`, `Portrait/People`, `Animal/Pet`, and `Other` using CLIP classification.
-
----
-
-## Tech Stack
-
-- **Framework:** FastAPI (Python 3.10)
-- **Database:** SQLite & SQLAlchemy
-- **Vector Index:** FAISS (faiss-cpu)
-- **Deep Learning Embeddings:** OpenAI CLIP (via Hugging Face Transformers)
-- **OCR Engine:** EasyOCR (PyTorch backend)
-- **Biometric Detection:** face_recognition (wrapping dlib)
-- **Clustering Algorithm:** DBSCAN (scikit-learn)
+| Feature | Description |
+|---|---|
+| 🔍 **Semantic Search** | Search photos using natural language — *"a dog on the beach"*, *"sunset over mountains"* |
+| 📄 **OCR Text Search** | Find photos containing text — receipts, screenshots, documents, whiteboards |
+| 📁 **Smart Categories** | Zero-shot AI classification into Animals, Landscapes, Portraits, Documents, and more |
+| 🔁 **Duplicate Finder** | Detect exact and near-duplicate photos using Perceptual Hashing (pHash) |
+| 📤 **Single Upload** | Drag & drop any image directly into the browser |
+| 🗂️ **Folder Scanner** | Paste a local folder path to bulk-import and process an entire directory |
+| 🖼️ **Lightbox Viewer** | Click any photo for a full-resolution preview with metadata, OCR text, and download |
+| 💻 **100% Local** | All AI runs on your machine — CLIP, EasyOCR, FAISS, SQLite — zero cloud dependency |
 
 ---
 
-## Getting Started
+## 🖥️ Tech Stack
+
+### Backend
+- **[FastAPI](https://fastapi.tiangolo.com/)** — High-performance async Python web framework
+- **[SQLite + SQLAlchemy](https://www.sqlalchemy.org/)** — Lightweight local database for photo metadata
+- **[FAISS](https://github.com/facebookresearch/faiss)** — Facebook AI Similarity Search for vector indexing
+- **[OpenAI CLIP](https://github.com/openai/CLIP)** — Vision-language model for semantic embeddings
+- **[EasyOCR](https://github.com/JaidedAI/EasyOCR)** — Optical Character Recognition for text extraction
+- **[ImageHash](https://github.com/JohannesBuchner/imagehash)** — Perceptual hashing for duplicate detection
+- **[Uvicorn](https://www.uvicorn.org/)** — ASGI server for running FastAPI
+
+### Frontend
+- **Vanilla HTML + CSS + JavaScript** — Zero framework dependencies
+- **Google Fonts (Outfit)** — Premium typography
+- **Custom SVG Icons** — Inline scalable icons
+- **CSS Variables + Animations** — Premium light theme with micro-interactions
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Docker & Docker Compose **OR**
-- Python 3.10+ with `cmake` and a C++ compiler installed (for compiling `dlib` locally)
+- Python 3.10+
+- pip or conda
 
----
-
-### Option A: Running with Docker (Recommended)
-Docker containers build all native dependencies (including CMake, gcc, and dlib compilation) out of the box.
-
-1. **Clone/Move into the workspace:**
-   ```bash
-   cd "/Users/keshavgoyal/Desktop/Ai -photo detector"
-   ```
-
-2. **Start the containers using docker-compose:**
-   ```bash
-   docker compose up -d --build
-   ```
-
-3. **Verify API is running:**
-   Visit `http://localhost:8000/` or query:
-   ```bash
-   curl http://localhost:8000/
-   ```
-
----
-
-### Option B: Local Installation
-
-1. **Install System Dependencies (For MacOS/Homebrew):**
-   ```bash
-   brew install cmake pkg-config
-   ```
-
-2. **Create and Activate a Virtual Environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install Dependencies:**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. **Run Server Local:**
-   ```bash
-   uvicorn app.main:app --reload --port 8000
-   ```
-
----
-
-## API Reference
-
-### 1. Photo Upload
-- **Endpoint:** `POST /api/photos/upload`
-- **Content-Type:** `multipart/form-data`
-- **Request Parameters:**
-  - `file`: Image file (JPG, PNG, WEBP, BMP)
-- **Response:**
-  ```json
-  {
-    "id": 1,
-    "filename": "my_cat.jpg",
-    "filepath": "data/uploads/1c52119b-c4f4-411a-ab6a.jpg",
-    "phash": "a5d896131c9a0c4f",
-    "ocr_text": null,
-    "category": "Animal/Pet",
-    "width": 1024,
-    "height": 768,
-    "file_size": 142084,
-    "created_at": "2026-06-13T17:40:00",
-    "faces": []
-  }
-  ```
-
-### 2. Folder Scanning
-- **Endpoint:** `POST /api/photos/scan-folder`
-- **Content-Type:** `application/json`
-- **Request Body:**
-  ```json
-  {
-    "directory_path": "/absolute/path/to/my/local/photos"
-  }
-  ```
-- **Response:**
-  ```json
-  {
-    "status": "processing",
-    "message": "Scan initialized in the background. Found 45 images to process.",
-    "scanned_path": "/absolute/path/to/my/local/photos",
-    "photos_found": 45,
-    "photos_processed": 0
-  }
-  ```
-
-### 3. Natural Language Search
-- **Endpoint:** `GET /api/search`
-- **Parameters:**
-  - `q`: Search query string (e.g. `cat sitting on grass`)
-  - `type`: Search method: `semantic` (default), `ocr`, or `combined`
-  - `limit`: Max results (default `10`)
-- **Response:**
-  ```json
-  [
-    {
-      "photo": {
-        "id": 1,
-        "filename": "my_cat.jpg",
-        "filepath": "data/uploads/1c52119b-c4f4-411a-ab6a.jpg",
-        "phash": "a5d896131c9a0c4f",
-        "ocr_text": null,
-        "category": "Animal/Pet",
-        "width": 1024,
-        "height": 768,
-        "file_size": 142084,
-        "created_at": "2026-06-13T17:40:00",
-        "faces": []
-      },
-      "similarity": 0.7842
-    }
-  ]
-  ```
-
-### 4. Duplicate Detection
-- **Endpoint:** `GET /api/duplicates`
-- **Parameters:**
-  - `threshold`: Optional Hamming distance threshold override (default: `10`)
-- **Response:**
-  ```json
-  [
-    {
-      "phash": "a5d896131c9a0c4f",
-      "photos": [
-        { "id": 1, "filename": "original_cat.jpg", "filepath": "data/uploads/...jpg" },
-        { "id": 5, "filename": "copy_cat_resized.jpg", "filepath": "data/uploads/...jpg" }
-      ]
-    }
-  ]
-  ```
-
-### 5. Categories Grouping
-- **Endpoint:** `GET /api/categories`
-- **Response:**
-  ```json
-  [
-    {
-      "category": "Animal/Pet",
-      "photos": [
-        { "id": 1, "filename": "my_cat.jpg", "filepath": "data/uploads/1c52119b-c4f4-411a-ab6a.jpg" }
-      ]
-    },
-    {
-      "category": "Document/Receipt",
-      "photos": [
-        { "id": 2, "filename": "invoice_123.png", "filepath": "data/uploads/7a52119b-a3d2.png" }
-      ]
-    }
-  ]
-  ```
-
-### 6. Face Groups (People)
-- **Endpoint:** `GET /api/faces/groups`
-- **Response:**
-  ```json
-  [
-    {
-      "id": 1,
-      "name": "Person 1",
-      "created_at": "2026-06-13T17:42:00",
-      "faces": [
-        {
-          "id": 1,
-          "photo_id": 3,
-          "box_top": 120,
-          "box_right": 250,
-          "box_bottom": 240,
-          "box_left": 130,
-          "cluster_id": 1
-        }
-      ]
-    }
-  ]
-  ```
-
-### 7. Rename Face Group
-- **Endpoint:** `PUT /api/faces/groups/{id}`
-- **Request Body:**
-  ```json
-  {
-    "name": "Jane Doe"
-  }
-  ```
-- **Response:**
-  ```json
-  {
-    "id": 1,
-    "name": "Jane Doe",
-    "created_at": "2026-06-13T17:42:00",
-    "faces": [
-      {
-        "id": 1,
-        "photo_id": 3,
-        "box_top": 120,
-        "box_right": 250,
-        "box_bottom": 240,
-        "box_left": 130,
-        "cluster_id": 1
-      }
-    ]
-  }
-  ```
-
----
-
-## Running Automated Tests
-
-To run the Pytest verification suite:
+### 1. Clone the repository
 ```bash
-pytest -v
+git clone https://github.com/keshaviit/ai_photo_analysis.git
+cd ai_photo_analysis
 ```
+
+### 2. Create a virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate       # macOS/Linux
+venv\Scripts\activate          # Windows
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the server
+```bash
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+> ⚠️ First startup takes **15–30 seconds** to pre-load CLIP and EasyOCR models.
+
+### 5. Open the dashboard
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## 📂 Project Structure
+
+```
+ai_photo_analysis/
+├── app/
+│   ├── main.py                  # FastAPI app, startup, static file mounts
+│   ├── config.py                # Environment config, paths, thresholds
+│   ├── database.py              # SQLAlchemy engine and session
+│   ├── models.py                # Photo ORM model
+│   ├── schemas.py               # Pydantic request/response schemas
+│   ├── routers/
+│   │   ├── photos.py            # Upload & folder scan endpoints
+│   │   ├── search.py            # Semantic, OCR, categories, duplicates
+│   │   └── faces.py             # Face grouping endpoints
+│   ├── services/
+│   │   ├── clip.py              # CLIP model wrapper (text + image embeddings)
+│   │   ├── ocr.py               # EasyOCR wrapper
+│   │   ├── phash.py             # Perceptual hash computation & duplicate finder
+│   │   ├── vector_search.py     # FAISS index management
+│   │   ├── pipeline.py          # Full photo processing pipeline
+│   │   ├── storage.py           # File save, directory scan utilities
+│   │   └── face.py              # Face detection & clustering
+│   └── static/
+│       ├── index.html           # Main UI dashboard
+│       ├── style.css            # Premium light theme CSS
+│       └── app.js               # Frontend logic (tabs, search, upload, modal)
+├── data/                        # ⚠️ Git-ignored — created at runtime
+│   ├── uploads/                 # Stored image files
+│   ├── database.db              # SQLite database
+│   └── faiss_index.bin          # FAISS vector index
+├── tests/
+│   ├── conftest.py              # Test fixtures
+│   └── test_api.py              # API endpoint tests
+├── Dockerfile                   # Docker container definition
+├── docker-compose.yml           # Docker Compose setup
+├── requirements.txt             # Python dependencies
+├── run_server.sh                # Quick start shell script
+└── README.md
+```
+
+---
+
+## 🔌 API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/photos/upload` | Upload a single image file |
+| `POST` | `/api/photos/scan-folder` | Scan a local directory for images |
+| `GET` | `/api/search?q=...&type=semantic\|ocr\|combined` | Search photos |
+| `GET` | `/api/categories` | Get all photos grouped by AI category |
+| `GET` | `/api/duplicates?threshold=10` | Find near-duplicate photo groups |
+| `GET` | `/uploads/{filename}` | Serve uploaded image files |
+
+### Search Types
+- `semantic` — Uses CLIP embeddings + FAISS vector search
+- `ocr` — SQL `LIKE` search over extracted OCR text
+- `combined` — Merges both, ranked by similarity score
+
+---
+
+## 🐳 Docker
+
+```bash
+docker-compose up --build
+```
+
+This starts the app on `http://localhost:8000` with a persistent data volume.
+
+---
+
+## ⚙️ Configuration
+
+All settings are configurable via environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `sqlite:///data/database.db` | SQLAlchemy database URL |
+| `UPLOAD_DIR` | `data/uploads` | Directory for uploaded images |
+| `FAISS_INDEX_PATH` | `data/faiss_index.bin` | Path to FAISS index file |
+| `CLIP_MODEL_NAME` | `openai/clip-vit-base-patch32` | HuggingFace CLIP model |
+| `PHASH_THRESHOLD` | `10` | Hamming distance threshold for duplicate detection |
+
+---
+
+## 📸 How It Works
+
+```
+Image Upload / Folder Scan
+         │
+         ▼
+   Save to disk (data/uploads/)
+         │
+         ▼
+   Extract metadata (resolution, file size)
+         │
+    ┌────┴──────────────────────────────┐
+    │                                   │
+    ▼                                   ▼
+EasyOCR                             CLIP Model
+(Extract text)                  (Generate 512-dim embedding)
+    │                                   │
+    ▼                                   ▼
+Store OCR text                  Store in FAISS index
+in SQLite                       + Zero-shot category
+    │                                   │
+    └────────────┬──────────────────────┘
+                 │
+                 ▼
+         pHash computed
+         (Duplicate detection)
+                 │
+                 ▼
+         Stored in SQLite DB
+                 │
+                 ▼
+         Available in UI 🎉
+```
+
+---
+
+## 🛠️ Running Tests
+
+```bash
+pytest tests/ -v
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m "Add my feature"`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Author
+
+**Keshav Goyal**
+- GitHub: [@keshaviit](https://github.com/keshaviit)
+
+---
+
+> Built with ❤️ — 100% local AI, zero cloud, complete privacy.
