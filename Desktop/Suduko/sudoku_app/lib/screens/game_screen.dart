@@ -5,9 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/app_colors.dart';
+import '../core/audio_controller.dart';
 import '../core/game_controller.dart';
 import '../core/sudoku_generator.dart';
 import '../core/mascot_controller.dart';
+import '../widgets/flying_mascot_entrance.dart';
+import '../widgets/mascot_buddy_perch.dart';
 import '../widgets/mascot_widget.dart';
 import '../widgets/streak_celebration_overlay.dart';
 import '../ads/rewarded_ad_service.dart';
@@ -38,7 +41,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late ConfettiController _confettiController;
   bool _hasPlayedConfetti = false;
   int _prevMistakes = 0;
-  int _prevFilledCount = 0;
+  int? _prevFilledCount;
 
   @override
   void initState() {
@@ -89,6 +92,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     } else if (_controller.wrongInputCell != null) {
       if (_controller.mistakes > _prevMistakes) {
         _mascotController.onMistake();
+        AudioController.instance.playMascotBubble();
         _prevMistakes = _controller.mistakes;
       }
     } else {
@@ -102,9 +106,16 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           }
         }
       }
-      if (filled > _prevFilledCount) {
+      if (_prevFilledCount == null) {
+        _prevFilledCount = filled;
+      } else if (filled > _prevFilledCount!) {
         _prevFilledCount = filled;
         _mascotController.onCorrectMove();
+        if (_mascotController.streak == 3) {
+          AudioController.instance.playMascotStreak();
+        } else {
+          AudioController.instance.playMascotBubble();
+        }
       } else {
         _mascotController.onCellSelected(_controller.selectedCell != null);
       }
@@ -121,6 +132,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             _controller.addHint();
             _controller.useHint();
             _mascotController.onHintUsed();
+            AudioController.instance.playMascotBubble();
           },
           onAdDismissed: () {
             _isShowingAd = false;
@@ -136,6 +148,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     } else {
       _controller.useHint();
       _mascotController.onHintUsed();
+      AudioController.instance.playMascotBubble();
     }
   }
 
@@ -146,50 +159,54 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       body: SafeArea(
         child: _controller.isLoading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary))
-            : Stack(
-                children: [
-                  // Main Game UI
-                  IgnorePointer(
-                    ignoring:
-                        _controller.isPaused ||
-                        _controller.isGameWon ||
-                        _controller.isGameOver,
-                    child: Column(
-                      children: [
-                        _buildTopBar(context),
-                        _buildStatusLine(context),
-                        const Spacer(),
-                        _buildSudokuGrid(context),
-                        const Spacer(),
-                        _buildActionBar(context),
-                        SizedBox(height: 12.h),
-                        _buildNumberPad(context),
-                        SizedBox(height: 12.h),
-                      ],
+            : FlyingMascotEntrance(
+                controller: _mascotController,
+                child: Stack(
+                  children: [
+                    // Main Game UI
+                    IgnorePointer(
+                      ignoring:
+                          _controller.isPaused ||
+                          _controller.isGameWon ||
+                          _controller.isGameOver,
+                      child: Column(
+                        children: [
+                          _buildTopBar(context),
+                          _buildStatusLine(context),
+                          _buildMascotPerch(context),
+                          const Spacer(),
+                          _buildSudokuGrid(context),
+                          const Spacer(),
+                          _buildActionBar(context),
+                          SizedBox(height: 12.h),
+                          _buildNumberPad(context),
+                          SizedBox(height: 12.h),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // Pause Overlay
-                  if (_controller.isPaused &&
-                      !_controller.isGameWon &&
-                      !_controller.isGameOver)
-                    _buildPauseOverlay(context),
+                    // Pause Overlay
+                    if (_controller.isPaused &&
+                        !_controller.isGameWon &&
+                        !_controller.isGameOver)
+                      _buildPauseOverlay(context),
 
-                  // Victory Overlay
-                  if (_controller.isGameWon)
-                    widget.isDaily
-                        ? StreakCelebrationOverlay(
-                            onDismiss: () {
-                              if (mounted) {
-                                Navigator.pop(context);
-                              }
-                            },
-                          )
-                        : _buildVictoryOverlay(context),
+                    // Victory Overlay
+                    if (_controller.isGameWon)
+                      widget.isDaily
+                          ? StreakCelebrationOverlay(
+                              onDismiss: () {
+                                if (mounted) {
+                                  Navigator.pop(context);
+                                }
+                              },
+                            )
+                          : _buildVictoryOverlay(context),
 
-                  // Game Over Overlay
-                  if (_controller.isGameOver) _buildGameOverOverlay(context),
-                ],
+                    // Game Over Overlay
+                    if (_controller.isGameOver) _buildGameOverOverlay(context),
+                  ],
+                ),
               ),
       ),
     );
@@ -273,13 +290,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ),
             ],
           ),
-          MascotWidget(
-            controller: _mascotController,
-            size: 36,
-            enableBreathing: false,
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMascotPerch(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 4.h),
+      child: MascotBuddyPerch(controller: _mascotController),
     );
   }
 
